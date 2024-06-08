@@ -1,0 +1,261 @@
+
+Aluno - Ulisses Trabalho em Java.
+Turma - 1005
+
+Neste código, o jogo da velha é jogado no console. O jogador escolhe a linha e a coluna para fazer a jogada, e o programa verifica se a entrada é válida e se a posição está vazia. Se a entrada for inválida, o jogador é solicitado a tentar novamente. O programa também verifica se há um vencedor ou se o tabuleiro está completo, resultando em um empate.
+
+
+
+
+
+
+Explicação do Código
+Classe Principal (JogoDaVelha): Esta classe estende JFrame e implementa ActionListener.
+
+Interface Gráfica:
+
+Utiliza um GridLayout 3x3 para criar o tabuleiro do jogo da velha.
+Adiciona uma barra de menu (JMenuBar) com opções para iniciar um novo jogo e sair do jogo.
+Inicialização dos Botões:
+
+Cada botão é configurado com uma fonte grande e um ActionListener.
+Controle do Jogo:
+
+Quando um botão é clicado, verifica-se se a posição já está ocupada.
+Atualiza o texto do botão com o símbolo do jogador atual (X ou O).
+Verifica se há um vencedor ou se o tabuleiro está completo.
+Alterna entre os jogadores.
+Verificação de Vencedor:
+
+Checa todas as linhas, colunas e diagonais para determinar se um jogador venceu.
+Controle de Exceção:
+
+Utiliza JOptionPane para mostrar mensagens de erro e resultados do jogo.
+Funções Auxiliares:
+
+novoJogo(): Reinicia o jogo.
+Executando o Projeto no NetBeans
+Certifique-se de ter salvo o arquivo.
+Clique com o botão direito do mouse no arquivo JogoDaVelha.java e selecione Run File ou pressione Shift + F6
+
+
+
+
+
+Códico JogodaVelha.
+Jogo da Velha em Java.
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class JogoDaVelha extends JFrame implements ActionListener {
+    private static final int TAMANHO = 3;
+    private JButton[][] botoes = new JButton[TAMANHO][TAMANHO];
+    private char jogadorAtual = 'X';
+    private boolean jogoEmAndamento = true;
+
+    public JogoDaVelha() {
+        setTitle("Jogo da Velha");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Criar barra de menu
+        JMenuBar menuBar = new JMenuBar();
+        JMenu jogoMenu = new JMenu("Jogo");
+        JMenuItem novoJogoItem = new JMenuItem("Novo Jogo");
+        JMenuItem sairItem = new JMenuItem("Sair");
+
+        // Adicionar ouvintes de ação aos itens do menu
+        novoJogoItem.addActionListener(e -> novoJogo());
+        sairItem.addActionListener(e -> System.exit(0));
+
+        // Adicionar itens ao menu
+        jogoMenu.add(novoJogoItem);
+        jogoMenu.add(sairItem);
+        menuBar.add(jogoMenu);
+        setJMenuBar(menuBar);
+
+        // Criar o painel do tabuleiro
+        JPanel tabuleiro = new JPanel();
+        tabuleiro.setLayout(new GridLayout(TAMANHO, TAMANHO));
+
+        // Inicializar os botões
+        for (int i = 0; i < TAMANHO; i++) {
+            for (int j = 0; j < TAMANHO; j++) {
+                botoes[i][j] = new JButton("");
+                botoes[i][j].setFont(new Font("Arial", Font.PLAIN, 60));
+                botoes[i][j].setFocusPainted(false);
+                botoes[i][j].addActionListener(this);
+                tabuleiro.add(botoes[i][j]);
+            }
+        }
+
+        add(tabuleiro, BorderLayout.CENTER);
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (!jogoEmAndamento) {
+            return;
+        }
+
+        JButton botaoClicado = (JButton) e.getSource();
+        if (!botaoClicado.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Posição já ocupada. Escolha outra.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        botaoClicado.setText(String.valueOf(jogadorAtual));
+        botaoClicado.setEnabled(false);
+
+        if (verificarVencedor()) {
+            jogoEmAndamento = false;
+            JOptionPane.showMessageDialog(this, "Jogador " + jogadorAtual + " venceu!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
+        } else if (tabuleiroCompleto()) {
+            jogoEmAndamento = false;
+            JOptionPane.showMessageDialog(this, "O jogo terminou empatado!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            jogadorAtual = (jogadorAtual == 'X') ? 'O' : 'X';
+        }
+    }
+
+    private boolean verificarVencedor() {
+        for (int i = 0; i < TAMANHO; i++) {
+            if (botoes[i][0].getText().equals(String.valueOf(jogadorAtual)) &&
+                botoes[i][1].getText().equals(String.valueOf(jogadorAtual)) &&
+                botoes[i][2].getText().equals(String.valueOf(jogadorAtual))) {
+                return true;
+            }
+
+            if (botoes[0][i].getText().equals(String.valueOf(jogadorAtual)) &&
+                botoes[1][i].getText().equals(String.valueOf(jogadorAtual)) &&
+                botoes[2][i].getText().equals(String.valueOf(jogadorAtual))) {
+                return true;
+            }
+        }
+
+        if (botoes[0][0].getText().equals(String.valueOf(jogadorAtual)) &&
+            botoes[1][1].getText().equals(String.valueOf(jogadorAtual)) &&
+            botoes[2][2].getText().equals(String.valueOf(jogadorAtual))) {
+            return true;
+        }
+
+        if (botoes[0][2].getText().equals(String.valueOf(jogadorAtual)) &&
+            botoes[1][1].getText().equals(String.valueOf(jogadorAtual)) &&
+            botoes[2][0].getText().equals(String.valueOf(jogadorAtual))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean tabuleiroCompleto() {
+        for (int i = 0; i < TAMANHO; i++) {
+            for (int j = 0; j < TAMANHO; j++) {
+                if (botoes[i][j].getText().equals("")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void novoJogo() {
+        jogoEmAndamento = true;
+        jogadorAtual = 'X';
+        for (int i = 0; i < TAMANHO; i++) {
+            for (int j = 0; j < TAMANHO; j++) {
+                botoes[i][j].setText("");
+                botoes[i][j].setEnabled(true);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new JogoDaVelha());
+    }
+}
+
+
+
+Diagrama Uml do JogodaVelha.
+
+
+Descrição do Diagrama
+Classe JogoDaVelha:
+
+Atributos:
+TAMANHO: Define o tamanho do tabuleiro.
+botoes: Uma matriz de JButton representando o tabuleiro.
+jogadorAtual: Um caractere que representa o jogador atual ('X' ou 'O').
+jogoEmAndamento: Um booleano que indica se o jogo está em andamento.
+Métodos:
+JogoDaVelha(): Construtor que inicializa a interface gráfica e o tabuleiro.
+actionPerformed(ActionEvent e): Método para tratar as ações dos botões.
+novoJogo(): Método para reiniciar o jogo.
+verificarVencedor(): Método para verificar se há um vencedor.
+tabuleiroCompleto(): Método para verificar se o tabuleiro está completo.
+JButton:
+
+Botões utilizados para representar cada célula do tabuleiro do jogo da velha.
+JMenuBar, JMenu, JMenuItem:
+
+Utilizados para criar a barra de menu com opções de "Novo Jogo" e "Sair".
+ActionEvent:
+
+Utilizado para tratar eventos de ação disparados pelos botões.
+JOptionPane:
+
+Utilizado para mostrar mensagens de erro e informações para o usuário
+
++--------------------------------------+
+|              JogoDaVelha             |
+|--------------------------------------|
+| - TAMANHO: int                       |
+| - botoes: JButton[][]                |
+| - jogadorAtual: char                 |
+| - jogoEmAndamento: boolean           |
+|--------------------------------------|
+| + JogoDaVelha()                      |
+| + actionPerformed(ActionEvent e)     |
+| + novoJogo(): void                   |
+| + verificarVencedor(): boolean       |
+| + tabuleiroCompleto(): boolean       |
+|--------------------------------------|
+|               << JFrame >>           |
+|             << ActionListener >>     |
++--------------------------------------+
+
++------------+
+|   JButton  |
++------------+
+
++-----------+
+| JMenuBar  |
++-----------+
+
++---------+
+|  JMenu  |
++---------+
+
++-----------+
+| JMenuItem |
++-----------+
+
++---------------------+
+|      ActionEvent    |
++---------------------+
+
++-----------------+
+|    JOptionPane  |
++-----------------+
+
+
+
+
+
+
